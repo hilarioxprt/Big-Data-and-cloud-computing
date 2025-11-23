@@ -1,4 +1,4 @@
-# my_data_analysis — Spark-based Big Data ML & Analysis Exercises
+# my_data_analysis — Spark-based Big Data ML & Analysis work
 
 This repository contains concise, runnable Apache Spark examples (PySpark) and a focused notebook demonstrating practical big-data analysis and ML-ready preprocessing. The examples are implementation-agnostic so you can run them locally, on a cluster, or in cloud notebooks (Databricks, EMR, etc.). Update paths and commands to match your environment.
 
