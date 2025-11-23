@@ -1,6 +1,6 @@
 # my_data_analysis — Spark-based Big Data ML Exercises
 
-Welcome — this repository contains a set of machine learning exercises designed for university coursework that demonstrate how to use Apache Spark for big data analysis. The examples are intended to teach data ingestion, preprocessing, feature engineering, scalable model training (Spark MLlib), model evaluation, and simple hyperparameter tuning on medium-to-large datasets.
+Welcome — this repository contains a set of machine learning work designed for real-world environments as well as coursework that demonstrates how to use Apache Spark for big data analysis. The examples are intended to demonstrate my skills in ingestion, preprocessing, feature engineering, scalable model training (Spark MLlib), model evaluation, and simple hyperparameter tuning on medium-to-large datasets.
 
 > Note: This README is written to be implementation-agnostic so you can adapt it to run locally, on a cluster, or in cloud notebooks (Databricks, EMR, etc.). Update paths and commands below to match your environment.
 
@@ -71,7 +71,7 @@ $SPARK_HOME/bin/spark-submit \
 ```
 
 ## Quickstart — running on a cluster / cloud
-- Upload your code and data to the cluster (HDFS / S3 / DBFS).
+- Upload your code and data to the cluster (HDFS DBFS).
 - Use spark-submit pointing to your cluster's master (yarn, spark://, or the cloud provider's launcher).
 - Ensure the Python environment and dependencies are available on executors (use --py-files or build a wheel/egg, or use conda/virtualenv on cluster nodes).
 
@@ -81,14 +81,13 @@ $SPARK_HOME/bin/spark-submit \
   --master yarn \
   --deploy-mode cluster \
   --py-files dist/my_project.zip \
-  examples/train_model.py \
-  --input s3a://your-bucket/datasets/your-data \
-  --output s3a://your-bucket/models/
+  examples/train_model.py 
+
 ```
 
 ## Typical ML workflow used in the exercises
-1. Data ingestion (CSV, Parquet, JSON, JDBC, S3)
-2. Data cleaning and exploration using DataFrame APIs
+1. Data ingestion (CSV, txt, LIBSVM)
+2. Data cleaning and exploration using DataFrame
 3. Feature engineering: string indexing, categorical encoding, vector assembly, scaling
 4. Building Spark ML Pipelines to chain transformers and estimators
 5. Model training and evaluation (classification/regression metrics)
@@ -110,7 +109,7 @@ or check the top of each example script for supported flags.
 
 ## Datasets
 - Small sample data for quick iteration may be stored in `data/`.
-- For realistic experiments, use larger datasets on HDFS/S3 or other distributed storage.
+- For realistic experiments, use larger datasets on HDFS or other distributed storage.
 - Do not include large raw datasets in this repo.
 
 ## Testing and validation
@@ -138,18 +137,7 @@ If you'd like to contribute:
 3. Add tests and update the README if you add or change examples.
 4. Open a pull request describing your changes.
 
-## License
-Specify your license here (e.g., MIT, Apache-2.0) — update this section to match your intended license.
 
 ## Contact / Author
 - hilarioxprt — owner of the repository
-- For course-specific notes or to request additional exercises, open an issue or reach out via your university channels.
 
----
-
-If you want, I can:
-- Tailor this README to the exact files and layout in your repository (I can scan the repo and update paths/commands).
-- Add runnable examples and polished spark-submit commands using the precise script names.
-- Draft a CONTRIBUTING.md and simple scripts to bootstrap a local dev environment.
-
-Tell me which of these you'd like next and I will update the README or add files accordingly.
