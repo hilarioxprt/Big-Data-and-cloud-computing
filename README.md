@@ -1,143 +1,101 @@
-# my_data_analysis — Spark-based Big Data ML Exercises
+# my_data_analysis — Spark-based Big Data ML & Analysis Exercises
 
-Welcome — this repository contains a set of machine learning work designed for real-world environments as well as coursework that demonstrates how to use Apache Spark for big data analysis. The examples are intended to demonstrate my skills in ingestion, preprocessing, feature engineering, scalable model training (Spark MLlib), model evaluation, and simple hyperparameter tuning on medium-to-large datasets.
+This repository contains concise, runnable Apache Spark examples (PySpark) and a focused notebook demonstrating practical big-data analysis and ML-ready preprocessing. The examples are implementation-agnostic so you can run them locally, on a cluster, or in cloud notebooks (Databricks, EMR, etc.). Update paths and commands to match your environment.
 
-> Note: This README is written to be implementation-agnostic so you can adapt it to run locally, on a cluster, or in cloud notebooks (Databricks, EMR, etc.). Update paths and commands below to match your environment.
+Highlights
+- Worked PySpark notebook that ingests a CSV (DigitalBreathTestData2013.csv), demonstrates RDD → DataFrame conversion, schema enforcement, and end-to-end analytics.
+- Typical Spark ML preprocessing patterns (StringIndexer, VectorAssembler, OneHotEncoder, scaling) and pipeline-ready data shaping.
+- Examples show grouping, filtering, SQL queries, aggregation, and exporting small results to Pandas for reporting.
 
-## What you'll find here
-- Example Spark jobs (PySpark) that demonstrate typical ML workflows:
-  - data loading and cleaning
-  - feature engineering (VectorAssembler, StringIndexer, OneHotEncoder, scaling)
-  - building pipelines and training models with Spark MLlib
-  - evaluating and persisting models
-  - simple hyperparameter search with CrossValidator or TrainValidationSplit
-- (Optional) Jupyter notebooks demonstrating the same concepts interactively — check `/notebooks` if present.
-- Sample scripts under `/scripts` or `/examples` (adjust to your repo layout).
-- Guidance and runnable commands to execute with spark-submit or within an interactive PySpark session.
-
-## Repository structure (example)
-The actual layout may vary. Typical layout:
-- README.md — this file
-- examples/ or scripts/ — PySpark example scripts
-- notebooks/ — Jupyter notebooks (if included)
-- data/ — small sample datasets for quick testing (do not store large data here)
-- docs/ — additional documentation or notes
-- requirements.txt — Python dependencies (if present)
-
-If your repository uses different directories, replace the paths in the examples below.
-
-## Prerequisites
+Requirements
 - Java 8 or 11
-- Apache Spark 3.x (or compatible Spark version used in the examples)
-- Python 3.8+ (for PySpark scripts)
-- pip and virtualenv (recommended) or conda
-- Optional: Docker, Databricks, EMR, or another managed Spark environment for larger-scale runs
+- Apache Spark 3.x
+- Python 3.8+ and pyspark
+- Optional: virtualenv or conda for dependency isolation
 
-Install Python dependencies locally (if a requirements file exists):
+Quick setup
 ```bash
 python -m venv venv
 source venv/bin/activate
-pip install -r requirements.txt
-```
-If there is no requirements.txt, at minimum install pyspark for local development:
-```bash
-pip install pyspark
+pip install pyspark pandas
 ```
 
-## Quickstart — running a PySpark example locally
-1. Start a Spark session (local mode) inside a Python script or notebook:
+Repository layout (typical)
+- README.md — this file
+- examples/ — PySpark example scripts (train, preprocess, evaluate)
+- notebooks/ — Jupyter notebooks (interactive walkthroughs)
+- data/ — small sample datasets (e.g., DigitalBreathTestData2013.csv)
+- models/ — serialized models / outputs (not committed)
+- tests/ — unit / integration tests (if present)
+
+Quickstart — run locally
+1. Start a SparkSession inside a script or notebook:
 ```python
 from pyspark.sql import SparkSession
-
 spark = SparkSession.builder \
-    .appName("example") \
+    .appName("my_data_analysis") \
     .master("local[*]") \
     .getOrCreate()
 ```
-2. Run an example script directly:
+2. Run an example script (adjust paths and args):
 ```bash
-python examples/train_model.py --input data/sample.csv --output models/
+python examples/train_model.py --input data/DigitalBreathTestData2013.csv --output models/
 ```
-(Adjust script name and CLI args to match actual files.)
-
-3. Using spark-submit (recommended for closer parity with cluster runs):
+3. Use spark-submit to mimic cluster behavior:
 ```bash
 $SPARK_HOME/bin/spark-submit \
   --master local[*] \
-  --deploy-mode client \
   examples/train_model.py \
-  --input data/large_dataset.parquet \
+  --input data/DigitalBreathTestData2013.csv \
   --output models/
 ```
 
-## Quickstart — running on a cluster / cloud
-- Upload your code and data to the cluster (HDFS DBFS).
-- Use spark-submit pointing to your cluster's master (yarn, spark://, or the cloud provider's launcher).
-- Ensure the Python environment and dependencies are available on executors (use --py-files or build a wheel/egg, or use conda/virtualenv on cluster nodes).
+Notebook: "comnined self and 4a.ipynb" — key points
+- Data ingestion:
+  - Loaded CSV both via RDD (sc.textFile) and DataFrame (spark.read.csv) with an explicit schema.
+  - Handled header collisions by renaming the column BreathAlcoholLevel(microg 100ml) → AlcoholLevel.
+- Parsing and schema:
+  - Demonstrates a robust parsing function for RDD → tuples and creation of a DataFrame with named fields (Reason, Month, Year, WeekType, TimeBand, AlcoholLevel, AgeBand, Gender).
+  - Shows defining a StructType schema when reading CSV to get typed columns (IntegerType for Year, AlcoholLevel).
+- Data cleaning / projection:
+  - Converted Gender values between string ("Male"/"Female") and numeric representations used in code.
+  - Filtered to create subsets (e.g., failed tests with AlcoholLevel > 35).
+- Analysis examples:
+  - Counted total records and per-key counts (countByKey / groupBy).
+  - Computed per-month fail proportions (positive tests / total tests), ordered by fail rate and exported to Pandas for summary/statistics.
+  - Identified top Reasons, most common TimeBand and AgeBand for failed tests.
+  - Showed sample of highest AlcoholLevel records (orderBy desc).
+- Performance and UX notes:
+  - Use .cache() on intermediate DataFrames/RDDs used repeatedly.
+  - Converting to Pandas is appropriate for small aggregations; avoid for full datasets.
+  - When running on clusters, ensure dependencies are available to executors (--py-files or a packaged wheel).
 
-Example (Spark on YARN):
-```bash
-$SPARK_HOME/bin/spark-submit \
-  --master yarn \
-  --deploy-mode cluster \
-  --py-files dist/my_project.zip \
-  examples/train_model.py 
+Typical ML workflow illustrated
+1. Ingest raw data (CSV, parquet).
+2. Cleaning and casting types (schema enforcement).
+3. Feature engineering (categorical encoding, VectorAssembler).
+4. Build Spark ML Pipelines.
+5. Train, evaluate, and persist models.
+6. Hyperparameter tuning with CrossValidator / TrainValidationSplit.
 
-```
+Best practices
+- Define and reuse an explicit schema for CSV reads to avoid header / auto-inference surprises.
+- Rename awkward column names early to stable, code-friendly identifiers.
+- Use Spark SQL or DataFrame API consistently; register temp views for repeatable analyses.
+- Keep heavy exports to Pandas limited to aggregated or sampled results.
+- For production / cluster runs, package dependent modules and control driver/executor memory via spark-submit flags.
 
-## Typical ML workflow used in the exercises
-1. Data ingestion (CSV, txt, LIBSVM)
-2. Data cleaning and exploration using DataFrame
-3. Feature engineering: string indexing, categorical encoding, vector assembly, scaling
-4. Building Spark ML Pipelines to chain transformers and estimators
-5. Model training and evaluation (classification/regression metrics)
-6. Hyperparameter tuning with CrossValidator or TrainValidationSplit
-7. Saving and loading models with MLWriter/MLReader
+Troubleshooting
+- CSVHeaderChecker warnings: ensure schema matches header names or rename after read.
+- ClassNotFound / dependency issues on cluster: package Python deps (--py-files) or use a shared environment.
+- Memory issues: set --driver-memory and --executor-memory appropriately; tune partitions.
 
-## Configurable parameters
-Most example scripts accept arguments for:
-- input path
-- output path (models / predictions)
-- number of partitions / parallelism
-- model hyperparameters or the path to a config file
+Contributing
+- Fork, create a branch, add tests, update README for any changes, and open a pull request describing your change.
 
-Run:
-```bash
-python examples/train_model.py --help
-```
-or check the top of each example script for supported flags.
+Author / Contact
+- hilarioxprt — repository owner
 
-## Datasets
-- Small sample data for quick iteration may be stored in `data/`.
-- For realistic experiments, use larger datasets on HDFS or other distributed storage.
-- Do not include large raw datasets in this repo.
-
-## Testing and validation
-- Unit tests (if present) can be run via pytest:
-```bash
-pytest tests/
-```
-- For integration tests (Spark jobs), run them in local mode with smaller datasets.
-
-## Troubleshooting
-- "ClassNotFoundException" or dependency issues on the cluster: package all required Python modules and make them available to executors (use --py-files or a cluster-wide environment).
-- Memory issues: tune driver and executor memory via spark-submit flags:
-  --driver-memory, --executor-memory, --executor-cores, and adjust parallelism.
-- Unexpected skew: increase partitions or use salting strategies in joins.
-
-## Extending the exercises
-- Add more datasets and notebook walkthroughs.
-- Implement additional models (Gradient-Boosted Trees, Random Forests, ALS for recommendation).
-- Add evaluation dashboards and experiment tracking (MLflow, TensorBoard, or a custom logger).
-
-## Contributing
-If you'd like to contribute:
-1. Fork the repository.
-2. Create a feature branch.
-3. Add tests and update the README if you add or change examples.
-4. Open a pull request describing your changes.
-
-
-## Contact / Author
-- hilarioxprt — owner of the repository
-
+License & Data
+- Data in the notebook is noted as Crown Copyright (Open Government Licence v3.0).
+- Do not commit large datasets to this repository; use external storage for large files.
