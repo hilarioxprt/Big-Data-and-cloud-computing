@@ -82,11 +82,6 @@ Notebook: combined self and 4a.ipynb — key points
 - Reproducibility, tooling & communication
   - Environment isolation (venv/conda), clear quickstart, notebook narratives, and concise Pandas exports that make analyses reviewable and audit-friendly.
 
-Why this matters to a hiring reviewer
-- End-to-end evidence: the notebooks show the full pipeline from messy data ingestion to production-minded feature pipelines, model training, evaluation, and shareable reporting.
-- Practical judgement: demonstrates when to use Spark vs. Pandas, how to tune performance for scale, and how to prepare work for cluster execution and hand-off.
-- Readiness for production: code and notebook patterns focus on schema stability, reproducibility, and packaging—exact qualities valuable for data engineering or ML infrastructure roles.
-
 Where to look
 - Open /notebooks to inspect the concrete code cells and outputs. Each notebook is intentionally concise, documented, and focused on demonstrable outcomes you can validate quickly.
 
