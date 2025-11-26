@@ -50,7 +50,7 @@ $SPARK_HOME/bin/spark-submit \
   --output models/
 ```
 
-Notebook: combined self and 4a.ipynb — key points
+Notebooks key points:
 - Ingest: CSV via RDD (sc.textFile) and DataFrame (spark.read.csv) with explicit schema; stable column renaming for awkward headers.
 - Parsing & typing: robust RDD → tuple parsing, StructType schemas for typed columns (IntegerType/DoubleType).
 - Cleaning: categorical normalization, null handling, type casting, and focused filters (e.g., AlcoholLevel > 35).
