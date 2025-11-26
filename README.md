@@ -1,11 +1,11 @@
 # my_data_analysis — Spark-based Big Data ML & Analysis work
 
-This repository contains concise, runnable Apache Spark examples (PySpark) and a focused notebook demonstrating practical big-data analysis and ML-ready preprocessing. The examples are implementation-agnostic so you can run them locally, on a cluster, or in cloud notebooks (Databricks, EMR, etc.). Update paths and commands to match your environment.
+This repository contains concise, runnable Apache Spark examples (PySpark) and Jupyter notebooks that demonstrate practical big-data analysis, production-minded preprocessing, and end-to-end model workflows.
 
 Highlights
-- Worked PySpark notebook that ingests a CSV (DigitalBreathTestData2013.csv), demonstrates RDD → DataFrame conversion, schema enforcement, and end-to-end analytics.
+- Worked PySpark notebook that ingests a CSV (DigitalBreathTestData2013.csv), demonstrates RDD → DataFrame conversion, explicit schema enforcement, and end-to-end analytics.
 - Typical Spark ML preprocessing patterns (StringIndexer, VectorAssembler, OneHotEncoder, scaling) and pipeline-ready data shaping.
-- Examples show grouping, filtering, SQL queries, aggregation, and exporting small results to Pandas for reporting.
+- Examples show grouping, filtering, SQL queries, aggregation, correlation analysis and exporting small results to Pandas for reporting.
 
 Requirements
 - Java 8 or 11
@@ -17,7 +17,7 @@ Quick setup
 ```bash
 python -m venv venv
 source venv/bin/activate
-pip install pyspark pandas
+pip install pyspark pandas matplotlib seaborn
 ```
 
 Repository layout (typical)
@@ -50,45 +50,45 @@ $SPARK_HOME/bin/spark-submit \
   --output models/
 ```
 
-Notebook: "comnined self and 4a.ipynb" — key points
-- Data ingestion:
-  - Loaded CSV both via RDD (sc.textFile) and DataFrame (spark.read.csv) with an explicit schema.
-  - Handled header collisions by renaming the column BreathAlcoholLevel(microg 100ml) → AlcoholLevel.
-- Parsing and schema:
-  - Demonstrates a robust parsing function for RDD → tuples and creation of a DataFrame with named fields (Reason, Month, Year, WeekType, TimeBand, AlcoholLevel, AgeBand, Gender).
-  - Shows defining a StructType schema when reading CSV to get typed columns (IntegerType for Year, AlcoholLevel).
-- Data cleaning / projection:
-  - Converted Gender values between string ("Male"/"Female") and numeric representations used in code.
-  - Filtered to create subsets (e.g., failed tests with AlcoholLevel > 35).
-- Analysis examples:
-  - Counted total records and per-key counts (countByKey / groupBy).
-  - Computed per-month fail proportions (positive tests / total tests), ordered by fail rate and exported to Pandas for summary/statistics.
-  - Identified top Reasons, most common TimeBand and AgeBand for failed tests.
-  - Showed sample of highest AlcoholLevel records (orderBy desc).
-- Performance and UX notes:
-  - Use .cache() on intermediate DataFrames/RDDs used repeatedly.
-  - Converting to Pandas is appropriate for small aggregations; avoid for full datasets.
-  - When running on clusters, ensure dependencies are available to executors (--py-files or a packaged wheel).
+Notebook: combined self and 4a.ipynb — key points
+- Ingest: CSV via RDD (sc.textFile) and DataFrame (spark.read.csv) with explicit schema; stable column renaming for awkward headers.
+- Parsing & typing: robust RDD → tuple parsing, StructType schemas for typed columns (IntegerType/DoubleType).
+- Cleaning: categorical normalization, null handling, type casting, and focused filters (e.g., AlcoholLevel > 35).
+- Analysis: groupBy/SQL aggregations, fail-rate calculations, top-k queries, exporting summarized results to Pandas for reporting.
+- ML workflow: feature engineering (indexing, one-hot, assembler), pipeline composition, model training, evaluation and persistence.
+- Performance: use of .cache(), partition and memory tuning, and packaging dependencies for cluster runs.
 
-Typical ML workflow illustrated
-1. Ingest raw data (CSV, parquet).
-2. Cleaning and casting types (schema enforcement).
-3. Feature engineering (categorical encoding, VectorAssembler).
-4. Build Spark ML Pipelines.
-5. Train, evaluate, and persist models.
-6. Hyperparameter tuning with CrossValidator / TrainValidationSplit.
+## Skills demonstrated (Jupyter notebooks)
 
-Best practices
-- Define and reuse an explicit schema for CSV reads to avoid header / auto-inference surprises.
-- Rename awkward column names early to stable, code-friendly identifiers.
-- Use Spark SQL or DataFrame API consistently; register temp views for repeatable analyses.
-- Keep heavy exports to Pandas limited to aggregated or sampled results.
-- For production / cluster runs, package dependent modules and control driver/executor memory via spark-submit flags.
+- Core big-data engineering (PySpark)
+  - RDD and DataFrame APIs, SparkSession usage, explicit schema design and enforcement.
+  - Scalable ingestion patterns and safe parsing for messy CSV inputs.
 
-Troubleshooting
-- CSVHeaderChecker warnings: ensure schema matches header names or rename after read.
-- ClassNotFound / dependency issues on cluster: package Python deps (--py-files) or use a shared environment.
-- Memory issues: set --driver-memory and --executor-memory appropriately; tune partitions.
+- Data wrangling & production-ready cleaning
+  - Robust parsing, type casting, header normalization, null handling, and categorical mapping suitable for pipelines.
+
+- Feature engineering & ML pipelines
+  - StringIndexer, OneHotEncoder, VectorAssembler, scaling and composing Spark ML pipelines ready for productionizing.
+
+- Model training & evaluation
+  - Train/test splits, model fitting (example: Naive Bayes), MulticlassClassificationEvaluator, confusion-matrix calculations and standard metrics reporting.
+
+- Exploratory data analysis & visualization
+  - Aggregations, correlation matrices (Pearson & Spearman), scatter/heatmap visuals, and export-to-Pandas for concise stakeholder summaries.
+
+- Performance & deployment considerations
+  - Caching, partition awareness, spark-submit packaging (--py-files / wheel), and driver/executor memory tuning documented and demonstrated.
+
+- Reproducibility, tooling & communication
+  - Environment isolation (venv/conda), clear quickstart, notebook narratives, and concise Pandas exports that make analyses reviewable and audit-friendly.
+
+Why this matters to a hiring reviewer
+- End-to-end evidence: the notebooks show the full pipeline from messy data ingestion to production-minded feature pipelines, model training, evaluation, and shareable reporting.
+- Practical judgement: demonstrates when to use Spark vs. Pandas, how to tune performance for scale, and how to prepare work for cluster execution and hand-off.
+- Readiness for production: code and notebook patterns focus on schema stability, reproducibility, and packaging—exact qualities valuable for data engineering or ML infrastructure roles.
+
+Where to look
+- Open /notebooks to inspect the concrete code cells and outputs. Each notebook is intentionally concise, documented, and focused on demonstrable outcomes you can validate quickly.
 
 Contributing
 - Fork, create a branch, add tests, update README for any changes, and open a pull request describing your change.
@@ -97,5 +97,5 @@ Author / Contact
 - hilarioxprt — repository owner
 
 License & Data
-- Data in the notebook is noted as Crown Copyright (Open Government Licence v3.0).
+- Data in the notebook is Crown Copyright (Open Government Licence v3.0).
 - Do not commit large datasets to this repository; use external storage for large files.
